@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  labels:
+    app: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+        - name: product-service
+          image: "{{ .Values.productService.image.repository }}:{{ .Values.productService.image.tag }}"
+          imagePullPolicy: {{ .Values.productService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.productService.service.port }}
