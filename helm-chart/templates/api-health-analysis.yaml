@@ -13,7 +13,7 @@ spec:
     provider:
       prometheus:
         # Đường dẫn mặc định của Prometheus trong K8s khi cài bằng helm/ansible
-        address: http://prometheus-server.monitoring.svc.cluster.local:9090
+        address: http://192.168.122.22:9090
         # Truy vấn PromQL đo tỷ lệ lỗi của api-gateway
         query: |
           sum(rate(http_request_duration_seconds_count{app="api-gateway", status=~"5.*"}[1m])) 
