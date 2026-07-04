@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: api-health-analysis
+spec:
+  metrics:
+  - name: error-rate-check
+    interval: 20s # Cứ 20s truy vấn Prometheus 1 lần
+    # Phải thành công liên tiếp, nếu thất bại 2 lần -> Rollback
+    failureLimit: 2 
+    # Điều kiện thành công: Tỷ lệ lỗi HTTP 5xx phải < 2% (0.02)
+    successCondition: result[0] <= 0.02
+    provider:
+      prometheus:
+        # Đường dẫn mặc định của Prometheus trong K8s khi cài bằng helm/ansible
+        address: http://prometheus-server.monitoring.svc.cluster.local:9090
+        # Truy vấn PromQL đo tỷ lệ lỗi của api-gateway
+        query: |
+          sum(rate(http_request_duration_seconds_count{app="api-gateway", status=~"5.*"}[1m])) 
+          / 
+          sum(rate(http_request_duration_seconds_count{app="api-gateway"}[1m]))

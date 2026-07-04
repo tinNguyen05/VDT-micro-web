@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: api-gateway
+  labels:
+    app: api-gateway
+spec:
+  replicas: 3 # Nâng lên 3 để dễ chia traffic Canary
+  selector:
+    matchLabels:
+      app: api-gateway
+  # --- PHẦN BỔ SUNG: CHIẾN LƯỢC CANARY ---
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20 # Chuyển 20% traffic sang phiên bản mới
+      - pause: {duration: 2m} # Dừng lại 2 phút để phân tích
+      analysis:
+        templates:
+        - templateName: api-health-analysis
+        startingStep: 1 # Kích hoạt phân tích ngay khi bước 1 bắt đầu
+  # ----------------------------------------
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: "{{ .Values.apiGateway.image.repository }}:{{ .Values.apiGateway.image.tag }}"
+          imagePullPolicy: {{ .Values.apiGateway.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.apiGateway.service.port }}
