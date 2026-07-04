@@ -3,6 +3,11 @@ const cors = require('cors');
 const client = require('prom-client');
 const app = express();
 
+const morgan = require('morgan');
+
+// Ép định dạng log in ra chuẩn: "GET /api/users 200"
+app.use(morgan(':method :url :status'));
+
 app.use(cors());
 app.use(express.json());
 
