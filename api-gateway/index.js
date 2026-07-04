@@ -1,31 +1,50 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const rateLimit = require('express-rate-limit'); // Bổ sung thư viện Rate Limit
+const rateLimit = require('express-rate-limit');
+const promBundle = require('express-prom-bundle');
 
 const app = express();
 app.use(express.json());
 
 // ---------------------------------------------------------
-// 4. RATE LIMITING: Chống DDoS (10 requests / 1 phút)
+// [THÊM MỚI] MONITORING: Tích hợp Prometheus Metrics
+// ---------------------------------------------------------
+// Middleware này tự động đo lường mọi request và tạo sẵn endpoint GET /metrics
+const metricsMiddleware = promBundle({
+    includeMethod: true,
+    includePath: true,
+    includeStatusCode: true,
+    promClient: {
+        collectDefaultMetrics: {}
+    }
+});
+app.use(metricsMiddleware);
+
+// ---------------------------------------------------------
+// 4. RATE LIMITING: Chống DDoS 
 // ---------------------------------------------------------
 const limiter = rateLimit({
-    windowMs: 60 * 1000, // 1 phút
-    max: 10, // Tối đa 10 request cho mỗi IP
-    statusCode: 409, // Trả về mã 409 Conflict theo đúng yêu cầu đề bài
-    message: { error: "Bạn đã vượt quá giới hạn 10 request/phút. Vui lòng thử lại sau!" }
+    windowMs: 60 * 1000,
+    max: 10,
+    statusCode: 409,
+    message: { error: "Bạn đã vượt quá giới hạn request/phút." }
 });
-// Áp dụng Rate Limit cho toàn bộ các route
-app.use(limiter);
 
-// Khóa bí mật dùng để ký và giải mã Token
+// LƯU Ý KHI DEMO ROLLBACK:
+// Khi bắn tải (load test), em phải comment dòng app.use(limiter) lại.
+// Nếu không, rate limit 409 sẽ làm nhiễu tỷ lệ lỗi 500 của Prometheus.
+
+
+// app.use(limiter); // TẠM TẮT KHI DEMO CANARY ROLLBACK
+
 const SECRET_KEY = 'viettel_vdt_2026_super_secret_key';
 
 // ---------------------------------------------------------
-// 1. ENDPOINT: MÔ PHỎNG ĐĂNG NHẬP VÀ CẤP TOKEN
+// 1. ENDPOINT: ĐĂNG NHẬP (Chỉ lấy Token, không sửa)
 // ---------------------------------------------------------
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    let role = 'user'; // Mặc định là user thường
+    let role = 'user';
 
     if (username === 'admin' && password === 'admin123') {
         role = 'admin';
@@ -40,7 +59,7 @@ app.post('/api/login', (req, res) => {
 });
 
 // ---------------------------------------------------------
-// 2. MIDDLEWARE: KIỂM TRA TOKEN & PHÂN QUYỀN (RBAC)
+// 2. MIDDLEWARE: KIỂM TRA TOKEN & PHÂN QUYỀN (Không sửa)
 // ---------------------------------------------------------
 const verifyTokenAndRole = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -51,21 +70,30 @@ const verifyTokenAndRole = (req, res, next) => {
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) return res.status(403).json({ error: 'Token không hợp lệ hoặc đã hết hạn!' });
         req.user = decoded;
-
         const userRole = req.user.role;
         const method = req.method;
 
         if (userRole === 'user' && (method === 'POST' || method === 'DELETE' || method === 'PUT')) {
-            return res.status(403).json({ error: 'HTTP 403 Forbidden: Tài khoản "user" không có quyền thực hiện hành động thao tác dữ liệu này.' });
+            return res.status(403).json({ error: 'HTTP 403 Forbidden: Tài khoản "user" không có quyền này.' });
         }
         next();
     });
 };
 
 // ---------------------------------------------------------
-// 3. CÁC ENDPOINT ĐÃ ĐƯỢC BẢO VỆ BỞI MIDDLEWARE
+// 3. CÁC ENDPOINT ĐÃ ĐƯỢC BẢO VỆ 
 // ---------------------------------------------------------
 app.get('/api/users', verifyTokenAndRole, (req, res) => {
+
+
+    // --------------------------------------------------------
+    return res.status(500).json({
+        error: "🔥 LỖI HỆ THỐNG - BẢN CẬP NHẬT GÂY CRASH APP! 🔥"
+    });
+
+
+    // --------------------------------------------------------
+
     res.json({ message: 'GET: Đọc dữ liệu thành công', user: req.user.username });
 });
 
