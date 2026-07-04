@@ -30,6 +30,7 @@ app.get('/orders', (req, res) => {
     res.json(orders);
 });
 
-app.listen(3002, () => {
-    console.log('Order Service is running on port 3002');
+// Chuyển sang port 3001 cho khớp với values.yaml
+app.listen(3001, '0.0.0.0', () => {
+    console.log('Order Service is running on port 3001');
 });

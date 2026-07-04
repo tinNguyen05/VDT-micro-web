@@ -43,6 +43,7 @@ app.delete('/api/users/:id', (req, res) => {
     res.json({ message: 'Đã xóa thành công' });
 });
 
-app.listen(3004, () => {
-    console.log('User Service đang chạy tại port 3004');
+// Chuyển sang port 3003 cho khớp với values.yaml
+app.listen(3003, '0.0.0.0', () => {
+    console.log('User Service đang chạy tại port 3003');
 });

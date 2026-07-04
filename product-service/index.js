@@ -21,6 +21,7 @@ app.get('/products', (req, res) => {
     res.json(products);
 });
 
-app.listen(3001, () => {
-    console.log('Product Service is running on port 3001');
+// Chuyển sang port 3002 cho khớp với values.yaml
+app.listen(3002, '0.0.0.0', () => {
+    console.log('Product Service is running on port 3002');
 });
