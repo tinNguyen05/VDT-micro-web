@@ -1,0 +1,46 @@
+# ========================
+# Node.js & React
+# ========================
+# Bỏ qua thư mục chứa thư viện (rất nặng, người khác tải code về sẽ tự chạy npm install)
+node_modules/
+*/node_modules/
+
+# Bỏ qua các file log lỗi của npm
+npm-debug.log
+npm-debug.log.*
+yarn-debug.log
+yarn-error.log
+
+# Bỏ qua thư mục build của React khi chuẩn bị đưa lên production
+/frontend/build/
+/frontend/dist/
+
+# ========================
+# Môi trường & Bảo mật
+# ========================
+# Bỏ qua các file chứa biến môi trường (mật khẩu database, API keys...)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ========================
+# Hệ điều hành & IDE (Code Editor)
+# ========================
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Cấu hình của VS Code
+.vscode/
+
+# Cấu hình của WebStorm / IntelliJ
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
