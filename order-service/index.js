@@ -1,9 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const client = require('prom-client');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+client.collectDefaultMetrics();
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
+});
 
 const orders = [];
 
