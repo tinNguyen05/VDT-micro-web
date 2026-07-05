@@ -12,10 +12,11 @@ spec:
     successCondition: result[0] <= 0.02
     provider:
       prometheus:
-        # Đường dẫn mặc định của Prometheus trong K8s khi cài bằng helm/ansible
+        # IP của máy Worker đang chạy Prometheus Docker-compose
         address: http://192.168.122.22:9090
-        # Truy vấn PromQL đo tỷ lệ lỗi của api-gateway
         query: |
-          sum(rate(http_request_duration_seconds_count{app="api-gateway", status=~"5.*"}[1m])) 
-          / 
-          sum(rate(http_request_duration_seconds_count{app="api-gateway"}[1m]))
+          # Dùng hàm sum over time để đảm bảo luôn có dữ liệu trả về kể cả khi không có traffic
+          # Tránh lỗi mảng rỗng (slice index out of range)
+          sum(increase(http_request_duration_seconds_count{app="api-gateway", status_code=~"5.*"}[1m]) or vector(0))
+          /
+          (sum(increase(http_request_duration_seconds_count{app="api-gateway"}[1m])) > 0 or vector(1))
