@@ -96,7 +96,7 @@ app.get('/api/users', verifyTokenAndRole, (req, res) => {
 
     // --------------------------------------------------------
 
-    res.json({ message: 'GET: Đọc dữ liệu thành công', user: req.user.username });
+    //  res.json({ message: 'GET: Đọc dữ liệu thành công', user: req.user.username });
 });
 
 app.post('/api/users', verifyTokenAndRole, (req, res) => {
