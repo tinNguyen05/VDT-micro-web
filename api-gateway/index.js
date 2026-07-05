@@ -35,7 +35,7 @@ const limiter = rateLimit({
 // Nếu không, rate limit 409 sẽ làm nhiễu tỷ lệ lỗi 500 của Prometheus.
 
 
-app.use(limiter); // TẠM TẮT KHI DEMO CANARY ROLLBACK
+//  app.use(limiter); // TẠM TẮT KHI DEMO CANARY ROLLBACK
 
 
 const SECRET_KEY = 'viettel_vdt_2026_super_secret_key';
@@ -89,9 +89,9 @@ app.get('/api/users', verifyTokenAndRole, (req, res) => {
 
     // --------------------------------------------------------
 
-    // return res.status(500).json({
-    //     error: "🔥 LỖI HỆ THỐNG - BẢN CẬP NHẬT GÂY CRASH APP! 🔥"
-    // });
+    return res.status(500).json({
+        error: "🔥 LỖI HỆ THỐNG - BẢN CẬP NHẬT GÂY CRASH APP! 🔥"
+    });
 
 
     // --------------------------------------------------------
