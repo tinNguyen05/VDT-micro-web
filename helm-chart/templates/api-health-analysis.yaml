@@ -13,7 +13,7 @@ spec:
     provider:
       prometheus:
         # IP của máy Worker đang chạy Prometheus Docker-compose
-        address: http://prometheus-server.monitoring.svc.cluster.local:9090
+        address: http://192.168.122.22:9090
         query: |
           (sum(increase(http_request_duration_seconds_count{app="api-gateway", status_code=~"5.*"}[1m])) or vector(0))
           /
