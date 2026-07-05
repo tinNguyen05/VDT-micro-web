@@ -13,6 +13,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "express-http-proxy": "^2.1.2",
+    "express-prom-bundle": "^8.0.0",
     "express-rate-limit": "^8.5.2",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
