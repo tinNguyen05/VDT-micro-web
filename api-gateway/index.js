@@ -14,6 +14,7 @@ const metricsMiddleware = promBundle({
     includeMethod: true,
     includePath: true,
     includeStatusCode: true,
+    customLabels: { app: 'api-gateway' },
     promClient: {
         collectDefaultMetrics: {}
     }
